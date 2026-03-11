@@ -176,9 +176,6 @@ if st.session_state.run_sim:
         with top_container:
             st.divider()
             
-            if res['is_zombie']:
-                st.error("🧟‍♂️ **[주의] 좀비 배관 (가짜 흑자 구간) 감지!**\n\n초기 30년(감가상각 기간) 동안은 세금 혜택으로 인해 장부상 흑자를 띄지만, **감가상각이 종료되는 31년 차부터는 방패가 사라져 순수 운영 적자(마이너스)로 수직 낙하**하여 미래 세대에 엄청난 비용 부담을 주는 배관입니다. 아래 차트 위 **'장기분석 토글'**을 켜서 꺾이는 지점을 직접 확인해 보세요!")
-                
             m1, m2, m3 = st.columns(3)
             m1.metric("순현재가치 (NPV)", f"{res['npv']:,.0f} 원")
             
@@ -200,19 +197,6 @@ if st.session_state.run_sim:
             4. **미래 가치 누적**: 총 **{active_period}년** 간의 현금흐름이 할인율 **{rate_pct}%**로 할인되어 반영됨
             """)
 
-            st.divider()
-            
-            st.subheader("📉 좀비 배관 민감도 분석 (유지/관리비 인상 리스크)")
-            if res['is_zombie']:
-                st.error("🚨 이미 감가상각 종료 후 운영 적자가 발생하는 **좀비 배관** 상태입니다.")
-            elif res['margin'] <= 0:
-                st.error("🚨 매출 마진 자체가 0 이하인 구조적 적자 상태입니다.")
-            elif res['zombie_threshold_pct'] == float('inf'):
-                st.success("✅ 유지관리비가 0원으로 설정되어 있어 좀비 배관 전락 위험이 없습니다.")
-            else:
-                st.warning(f"⚠️ 현재 설정된 판관비(유지비+관리비)가 향후 **약 {res['zombie_threshold_pct']:,.1f}% 이상 상승**하면, 감가상각 종료 후 적자로 전환되는 **'좀비 배관'**이 됩니다.")
-                st.info(f"👉 **마진 방어선:** 총 마진({res['margin']:,.0f}원) = 판관비 합계({res['sga']:,.0f}원) + 잉여 마진({res['margin'] - res['sga']:,.0f}원)")
-                
             st.divider()
             
             # [추가된 부분] 30년 / 50년 달성 목표 판매량 비교
