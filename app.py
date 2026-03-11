@@ -164,11 +164,8 @@ if st.session_state.run_sim:
     else:
         top_container = st.container()
         
-        toggle_placeholder = st.empty()
-        with toggle_placeholder:
-            long_term_mode = st.toggle("📈 장기분석 (최대 50년) 활성화", value=False)
-            
-        active_period = 50 if long_term_mode else analysis_period
+        # 장기분석 토글 관련 로직 삭제 및 30년 분석 기간으로 고정
+        active_period = analysis_period
         
         res = calculate_simulation(sim_len, sim_inv, sim_contrib, sim_other, sim_vol, sim_rev, sim_cost, 
                                    sim_jeon, sim_basic_rev, RATE, TAX, dep_period, active_period, c_maint, c_adm_jeon, c_adm_m)
@@ -199,34 +196,25 @@ if st.session_state.run_sim:
 
             st.divider()
             
-            # [추가된 부분] 30년 / 50년 달성 목표 판매량 비교
+            # [수정된 부분] 30년 달성 목표 판매량 비교
             st.subheader("💡 경제성 확보를 위한 제언")
             
             req_vol_m3_30 = res['required_vol_30'] / 42.563
-            req_vol_m3_50 = res['required_vol_50'] / 42.563
             sim_vol_m3 = sim_vol / 42.563
             
             if res['npv'] < 0:
                 st.error(f"⚠️ 현재 분석 조건으로는 경제성이 부족합니다. (목표 IRR {rate_pct}%)")
-                col_m1, col_m2 = st.columns(2)
-                with col_m1:
-                    st.markdown("👉 **[현재 기준] 30년 경제성 만족을 위한 최소 판매량**")
-                    st.info(f"### **{res['required_vol_30']:,.0f} MJ**\n\n≙ **{req_vol_m3_30:,.0f} ㎥**")
-                with col_m2:
-                    st.markdown("👉 **[장기 기준] 50년 경제성 만족을 위한 안정 판매량**")
-                    st.success(f"### **{res['required_vol_50']:,.0f} MJ**\n\n≙ **{req_vol_m3_50:,.0f} ㎥**")
+                st.markdown("👉 **[현재 기준] 30년 경제성 만족을 위한 최소 판매량**")
+                st.info(f"### **{res['required_vol_30']:,.0f} MJ**\n\n≙ **{req_vol_m3_30:,.0f} ㎥**")
             else:
                 st.success(f"✅ 현재 판매량은 경제성 확보 기준을 충족합니다.")
-                col_m1, col_m2, col_m3 = st.columns(3)
+                col_m1, col_m2 = st.columns(2)
                 with col_m1:
                     st.markdown("👉 **현재 입력 판매량**")
                     st.success(f"**{sim_vol:,.0f} MJ**\n\n(≙ {sim_vol_m3:,.0f} ㎥)")
                 with col_m2:
                     st.markdown("👉 **30년 기준 (최소)**")
                     st.info(f"**{res['required_vol_30']:,.0f} MJ**\n\n(≙ {req_vol_m3_30:,.0f} ㎥)")
-                with col_m3:
-                    st.markdown("👉 **50년 기준 (안정)**")
-                    st.info(f"**{res['required_vol_50']:,.0f} MJ**\n\n(≙ {req_vol_m3_50:,.0f} ㎥)")
         
         chart_data = pd.DataFrame({
             "Year": range(0, int(active_period) + 1),
