@@ -135,8 +135,18 @@ with col1:
 
 with col2:
     st.subheader("2. 수익 정보 (연간)")
-    sim_vol = st.number_input("연간 판매량 (MJ)", value=0.0)
-    st.caption(f"ℹ️ 환산 부피: **{sim_vol / 42.563:,.0f} ㎥** (적용 열량: 42.563 MJ/㎥)")
+    
+    # [수정] 단위 환산 토글 추가 (기본값 True: m3 입력 활성화)
+    use_m3 = st.toggle("🔄 단위 환산 (㎥ 입력 활성화)", value=True)
+    
+    if use_m3:
+        input_vol = st.number_input("연간 판매량 (㎥)", value=0.0)
+        sim_vol = input_vol * 42.563  # 입력받은 m3를 내부 계산용 MJ로 변환
+        st.caption(f"ℹ️ 환산 열량: **{sim_vol:,.0f} MJ** (적용 열량: 42.563 MJ/㎥)")
+    else:
+        sim_vol = st.number_input("연간 판매량 (MJ)", value=0.0)
+        st.caption(f"ℹ️ 환산 부피: **{sim_vol / 42.563:,.0f} ㎥** (적용 열량: 42.563 MJ/㎥)")
+        
     sim_rev = st.number_input("가스 연간 판매액 (원)", value=0, format="%d")
     sim_cost = st.number_input("가스 연간 판매원가 (원)", value=0, format="%d")
     
